@@ -1,5 +1,6 @@
 #include "drake/systems/analysis/simulator.h"
 
+#include <iostream>
 #include <thread>
 
 #include "drake/common/extract_double.h"
@@ -104,6 +105,7 @@ SimulatorStatus Simulator<T>::Initialize(const InitializeParams& params) {
   // Get the next timed event.
   const T next_timed_event_time =
       system_.CalcNextUpdateTime(*context_, timed_events_.get());
+  std::cout << "Initialize: " << context_->get_time() << " " << next_timed_event_time << std::endl;
 
   // Reset the context time.
   context_->SetTime(current_time);
@@ -223,7 +225,9 @@ SimulatorStatus Simulator<T>::AdvanceTo(const T& boundary_time) {
   if (time_or_witness_triggered_ & kWitnessTriggered)
     merged_events->AddToEnd(*witnessed_events_);
 
+  std::cout << "\n\nAdvanceTo called\n";
   while (true) {
+    std::cout << "\nStart of while loop\n";
     // Starting a new step on the trajectory.
     const T step_start_time = context_->get_time();
     DRAKE_LOGGER_TRACE("Starting a simulation step at {}", step_start_time);
@@ -258,6 +262,12 @@ SimulatorStatus Simulator<T>::AdvanceTo(const T& boundary_time) {
       next_publish_time = next_timed_event_time;
     }
 
+    std::cout << "Pre  IntegrateContinuousState ctx time: " << context_->get_time()
+              << " next_timed_event_time: " << next_timed_event_time
+              << " next_publish_time: " << next_publish_time
+              << " next_update_time: " << next_update_time
+              << std::endl;
+
     // Integrate the continuous state forward in time.
     time_or_witness_triggered_ = IntegrateContinuousState(
         next_publish_time,
@@ -265,6 +275,7 @@ SimulatorStatus Simulator<T>::AdvanceTo(const T& boundary_time) {
         next_timed_event_time,
         boundary_time,
         witnessed_events_.get());
+    std::cout << "Post IntegrateContinuousState ctx time: " << context_->get_time() << std::endl;
 
     // Update the number of simulation steps taken.
     ++num_steps_taken_;

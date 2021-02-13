@@ -1,6 +1,7 @@
 #include "drake/systems/framework/leaf_system.h"
 
 #include <cmath>
+#include <iostream>
 #include <limits>
 
 #include "drake/common/pointer_cast.h"
@@ -357,6 +358,12 @@ void LeafSystem<T>::DoCalcNextUpdateTime(
     const PeriodicEventData& event_data = event_pair.first;
     const Event<T>* const event = event_pair.second.get();
     const T t = GetNextSampleTime(event_data, context.get_time());
+
+    std::cout << "DoCalcNextUpdateTime      context time: " << context.get_time()
+              << "  NextSampleTime:       " << t
+              << " for name " << this->get_name() << std::endl;
+
+
     if (t < min_time) {
       min_time = t;
       next_events = {event};

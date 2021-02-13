@@ -123,6 +123,10 @@ EventStatus LcmPublisherSystem::PublishInputAsLcmMessage(
   std::vector<uint8_t> message_bytes;
   serializer_->Serialize(input, &message_bytes);
 
+  std::cout << "Publishing             at context time: " << context.get_time()
+            << " on channel " << channel_
+            << std::endl;
+
   // Publishes onto the specified LCM channel.
   lcm_->Publish(channel_, message_bytes.data(), message_bytes.size(),
                 context.get_time());

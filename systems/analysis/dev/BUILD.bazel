@@ -1,0 +1,29 @@
+# -*- python -*-
+
+load(
+    "@drake//tools/skylark:drake_cc.bzl",
+    "drake_cc_binary",
+    "drake_cc_googletest",
+    "drake_cc_library",
+    "drake_cc_package_library",
+)
+
+package(default_visibility = ["//visibility:public"])
+
+drake_cc_binary(
+    name = "lcm_bug_example",
+    srcs = [
+        "lcm_bug_example.cc",
+    ],
+    deps = [
+        "//lcm:real",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram",
+        "//systems/framework:diagram_builder",
+        "//systems/lcm",
+        "//systems/primitives:sine",
+    ],
+)
+
+
+
