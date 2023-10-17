@@ -120,6 +120,56 @@ GTEST_TEST(YamlIoTest, LoadFileChildName) {
   EXPECT_EQ(result.value, "some_value_2");
 }
 
+GTEST_TEST(YamlIoTest, LoadFileWithVariantNonDefault) {
+  const std::string data = R"""(
+value: !AllScalarsStruct
+  some_bool: true
+)""";
+  const std::string override = R"""(
+value:
+  some_int32: -1
+)""";
+
+  const std::optional<std::string> no_child_name;
+  const VariantInnerWithValueMismatch defaults;
+  LoadYamlOptions options;
+  options.allow_cpp_with_no_yaml = true;
+  const auto data_result =
+      LoadYamlString<VariantInnerWithValueMismatch>(
+          data, no_child_name, defaults, options);
+  const auto override_result =
+      LoadYamlString<VariantInnerWithValueMismatch>(
+          override, no_child_name, data_result, options);
+  const auto value = std::get<AllScalarsStruct>(override_result.value);
+  EXPECT_EQ(value.some_bool, true);
+  EXPECT_EQ(value.some_int32, -1);
+}
+
+GTEST_TEST(YamlIoTest, LoadFileWithVariantNonDefaultWithTag) {
+  const std::string data = R"""(
+value: !AllScalarsStruct
+  some_bool: true
+)""";
+  const std::string override = R"""(
+value: !AllScalarsStruct
+  some_int32: -1
+)""";
+
+  const std::optional<std::string> no_child_name;
+  const VariantInnerWithValueMismatch defaults;
+  LoadYamlOptions options;
+  options.allow_cpp_with_no_yaml = true;
+  const auto data_result =
+      LoadYamlString<VariantInnerWithValueMismatch>(
+          data, no_child_name, defaults, options);
+  const auto override_result =
+      LoadYamlString<VariantInnerWithValueMismatch>(
+          override, no_child_name, data_result, options);
+  const auto value = std::get<AllScalarsStruct>(override_result.value);
+  EXPECT_EQ(value.some_bool, true);
+  EXPECT_EQ(value.some_int32, -1);
+}
+
 GTEST_TEST(YamlIoTest, LoadFileChildNameBad) {
   const std::string filename =
       FindResourceOrThrow("drake/common/yaml/test/yaml_io_test_input_2.yaml");

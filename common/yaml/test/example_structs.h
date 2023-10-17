@@ -326,6 +326,15 @@ struct BigMapStruct {
   std::map<std::string, OuterStruct> value;
 };
 
+struct VariantInnerWithValueMismatch {
+  template <typename Archive>
+  void Serialize(Archive* a) {
+    a->Visit(DRAKE_NVP(value));
+  }
+
+  std::variant<DoubleStruct, AllScalarsStruct> value;
+};
+
 }  // namespace test
 }  // namespace yaml
 }  // namespace drake
